@@ -40,11 +40,11 @@ jobs:
           curl -LO https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage;
           chmod a+x appimagetool-$(uname -m).AppImage;
 
-      - if: github.event_name != 'pull_request' && (matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-22.04-arm')
-        name: import GPG key
-        run: echo -e $GPG_KEY | gpg --batch --import
-        env:
-          GPG_KEY: ${{ secrets.GPG_KEY }}
+          #      - if: github.event_name != 'pull_request' && (matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-22.04-arm')
+          #name: import GPG key
+          #run: echo -e $GPG_KEY | gpg --batch --import
+          #env:
+          #GPG_KEY: ${{ secrets.GPG_KEY }}
 
       - if: matrix.os != 'windows-latest'
         name: install conda dependencies for unix
@@ -57,7 +57,7 @@ jobs:
         working-directory: ${{ matrix.bundle_dir}}
         env:
             DEPLOY_RELEASE: ${{ matrix.tag }}
-            GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+            #GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
             APPIMAGETOOL_SIGN_PASSPHRASE: ${{ secrets.APPIMAGETOOL_SIGN_PASSPHRASE }}
 
       - if: (github.event_name != 'pull_request')
