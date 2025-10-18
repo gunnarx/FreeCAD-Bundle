@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set -xe
 
 if [[ -z "$ARCH" ]]; then
   # Get the architecture of the system

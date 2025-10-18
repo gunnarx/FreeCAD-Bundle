@@ -2,7 +2,7 @@ name: freecad_bundle
 on:
   push:
     branches:
-      - "*"
+      - main
   pull_request:
     branches:
       - main
@@ -15,30 +15,14 @@ jobs:
       max-parallel: 4
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, macos-13, ubuntu-latest, ubuntu-22.04-arm]
+        os: [ubuntu-latest]
         tag: ["weekly-builds"]
         include:
-          - os: windows-latest
-            bundle_dir: conda/win
-            asset_pattern: FreeCAD_.*Windows-x86_64
-          - os: macos-13
-            bundle_dir: conda/osx
-            asset_pattern: FreeCAD_.*macOS-x86_64
-          - os: macos-latest
-            bundle_dir: conda/osx
-            asset_pattern: FreeCAD_.*macOS-arm64
           - os: ubuntu-latest
             bundle_dir: conda/linux
             asset_pattern: FreeCAD_.*Linux-x86_64
-          - os: ubuntu-22.04-arm
-            bundle_dir: conda/linux
-            asset_pattern: FreeCAD_.*Linux-aarch64
 
     steps:
-      - if: matrix.os == 'windows-latest'
-        name: msys2
-        uses: msys2/setup-msys2@v2
-
       - uses: actions/checkout@v4
         name: Checkout
 
@@ -67,11 +51,6 @@ jobs:
         run: |
           mamba install p7zip sed curl -y -c conda-forge;
 
-      - if: matrix.os == 'windows-latest'
-        name: install conda dependencies for windows
-        run: |
-          mamba install curl -y -c conda-forge;
-
       - if: matrix.os != 'windows-latest'
         name: create unix bundle
         run: "bash ./create_bundle.sh"
@@ -80,14 +59,6 @@ jobs:
             DEPLOY_RELEASE: ${{ matrix.tag }}
             GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
             APPIMAGETOOL_SIGN_PASSPHRASE: ${{ secrets.APPIMAGETOOL_SIGN_PASSPHRASE }}
-
-      - if: matrix.os == 'windows-latest'
-        name: create windows bundle
-        shell: cmd
-        run: "call create_bundle.bat"
-        working-directory: ${{ matrix.bundle_dir}}
-        env:
-            DEPLOY_RELEASE: ${{ matrix.tag }}
 
       - if: (github.event_name != 'pull_request')
         name: Upload binaries to release and remove old ones
